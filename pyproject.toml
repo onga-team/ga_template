@@ -3,7 +3,6 @@ name = "my-project"
 version = "0.1.0"
 description = "A sample project using Poetry and Mypy"
 authors = ["Your Name <your.email@example.com>"]
-package-mode = false                                   # これを追加することでルートパッケージのインストールを無効にする
 
 [tool.poetry.dependencies]
 python = "^3.9"

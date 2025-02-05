@@ -7,43 +7,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 呼び出し側のリポジトリをチェックアウト（※必要に応じて）
+      # 1. 呼び出し側リポジトリ（実際のコードがある側）をチェックアウト
       - name: Checkout caller repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      # ga_template リポジトリ自体をサブディレクトリにチェックアウト
-      - name: Checkout ga_template repository
-        uses: actions/checkout@v4
-        with:
-          repository: onga-team/ga_template
-          ref: main
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: ga_template
+      # 2. ga_template リポジトリから設定ファイルを blob 形式で取得
+      - name: Fetch configuration files from ga_template
+        run: |
+          curl -sSL https://raw.githubusercontent.com/onga-team/ga_template/main/pyproject.toml -o pyproject.toml
+          curl -sSL https://raw.githubusercontent.com/onga-team/ga_template/main/mypy.ini -o mypy.ini
 
-      # Python のセットアップ（必要なバージョンに合わせて変更）
+      # 3. Python のセットアップ
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      # Poetry のインストール
+      # 4. Poetry のインストール
       - name: Install Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      # ga_template リポジトリ内の設定に基づき、Poetry を使って依存関係をインストール
-      - name: Install dependencies with Poetry from ga_template
-        working-directory: ga_template
-        run: poetry install
+      # 5. 依存関係のインストール（ルートパッケージのインストールをスキップ）
+      - name: Install dependencies with Poetry
+        run: poetry install --no-root
 
-      # Poetry 経由で Mypy による型チェックを実行（ga_template の設定ファイルが利用される）
+      # 6. 呼び出し側リポジトリ内の Python コードに対して Mypy を実行
       - name: Run Mypy for type checking
-        working-directory: ga_template
         run: poetry run mypy .
 
-      # 例としてのスクリプト実行（必要に応じて）
+      # 7. 例としてのスクリプト実行
       - name: Run a one-line script
         run: echo Hello from Organization
