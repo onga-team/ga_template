@@ -28,6 +28,12 @@ jobs:
           pip install --upgrade pip
           pip install mypy
 
+      - name: Install Pyright
+        run: npm install -g pyright
+
+      - name: Run Pyright for type checking
+        run: pyright
+
       - name: Run Mypy for type checking
         run: mypy .
 
