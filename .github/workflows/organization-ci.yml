@@ -7,33 +7,38 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # 1. 呼び出し側リポジトリ（実際のコードがある側）をチェックアウト
       - name: Checkout caller repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
 
-      # 2. ga_template リポジトリから設定ファイルを blob 形式で取得
-      - name: Fetch configuration files from ga_template
-        run: |
-          curl -sSL https://raw.githubusercontent.com/onga-team/ga_template/main/mypy.ini -o mypy.ini
+      - name: Checkout ga_template repository
+        uses: actions/checkout@v4
 
+      # 3. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
+      # 5. Install dependencies with pip
       - name: Install dependencies with pip
         run: |
-          pip install --upgrade pip
-          pip install mypy
+          pip install --upgrade pip mypy ruff
 
+      # 6. Run Ruff for linting
+      - name: Run Ruff for linting
+        run: ruff check .
+
+      # 7. Install Pyright
       - name: Install Pyright
         run: npm install -g pyright
 
+      # 8. Run Pyright for type checking
       - name: Run Pyright for type checking
         run: pyright
 
+
+      # 9. Run Mypy for type checking
       - name: Run Mypy for type checking
         run: mypy .
-
