@@ -28,7 +28,6 @@ jobs:
           pip install --upgrade pip
           pip install mypy
 
-      # 6. 呼び出し側リポジトリ内の Python コードに対して Mypy を実行
       - name: Run Mypy for type checking
-        run: poetry run mypy .
+        run: mypy .
 
